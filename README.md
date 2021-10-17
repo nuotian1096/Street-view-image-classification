@@ -4,6 +4,6 @@ Improve both phases using features adaptive weighting for street view image clas
 
 
 Project code display, readme.txt is the details 
-
+![image](https://github.com/nuotian1096/Street-view-image-classification/blob/master/1.png)
 
 
