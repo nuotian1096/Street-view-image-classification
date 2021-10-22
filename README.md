@@ -27,7 +27,7 @@ visual features adaptive weighting is introduced in the detection phase.
 
 Semantic features adaptive weighting is used in the context classification phase.
 
-# Citing Improve both phases using features adaptive weighting for street view image classification
+# Citing:
 
 # Getting Strated
 Project code display, readme.txt is the details.
