@@ -6,20 +6,20 @@
 ![总体流程图](https://github.com/nuotian1096/Street-view-image-classification/edit/master/1.png)
 
 # Results
-|Detector|AP(IoU=0.5:.05:.95)|AP(IoU=0.75)|AP(IoU=0.50)|
+| Detector | AP(IoU=0.5:.05:.95) | AP(IoU=0.75) | AP(IoU=0.50) |
 |--|--|--|--|
-|Ca-50|48.72|53.24|70.21|
-|Ca-101|48.92|53.88|70.13|
-|Ca-50 + VFAW|50.1|55.2|72.4|
-|Ca-101 + VFAW|50.8|55.9|72.8|
+| Ca-50 | 48.72 | 53.24 | 70.21 |
+| Ca-101 | 48.92 | 53.88 | 70.13 |
+| Ca-50 + VFAW | 50.1 | 55.2 | 72.4 |
+| Ca-101 + VFAW | 50.8 | 55.9 | 72.8 |
 
 visual features adaptive weighting is introduced in the detection phase.
 
-|Models|M-P|M-R|M-F1|
+| Models | M-P | M-R | M-F1 |
 |--|--|--|--|
-|Layout+simple-RNN|81.81|80.94|81.37|
-|Layout+SFAW|82.04|80.10|81.06|
-|Centroid Sorting+ SFAW|83.32|79.42|81.31|
+| Layout+simple-RNN | 81.81 | 80.94 | 81.37 |
+| Layout+SFAW | 82.04 | 80.10 | 81.06 |
+| Centroid Sorting+ SFAW | 83.32 | 79.42 | 81.31 |
 
 Semantic features adaptive weighting is used in the context classification phase.
 
