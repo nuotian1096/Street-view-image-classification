@@ -7,7 +7,7 @@ and then predict a land category label for the street view image. Experimental r
 encoding-classification” framework in both phases.
 
 # Overall process 
-![总体流程图](https://github.com/nuotian1096/Street-view-image-classification/edit/master/1.png)
+![overall process](https://github.com/nuotian1096/Street-view-image-classification/edit/master/1.png)
 
 # Results
 | Detector | AP(IoU=0.5:.05:.95) | AP(IoU=0.75) | AP(IoU=0.50) |
