@@ -1,6 +1,6 @@
 # Improve both phases using features adaptive weighting for street view image classification
 # Introduction
-features adaptive weighting is used in both phases to improve the overall performance of street view image classification. Firstly, visual features adaptive weighting is 
+  features adaptive weighting is used in both phases to improve the overall performance of street view image classification. Firstly, visual features adaptive weighting is 
 introduced in the detection phase to improve the recognition accuracy of building objects. Then, a semantic matrix is constructed by using the centroid sorting algorithm to 
 encode the detection results. Finally, in the text classification phase, the semantic feature adaptive weighting is used to enhance the connection between the building objects, 
 and then predict a land category label for the street view image. Experimental results show that the proposed method can effectively improve the performance of //“detection-
@@ -27,8 +27,10 @@ visual features adaptive weighting is introduced in the detection phase.
 
 Semantic features adaptive weighting is used in the context classification phase.
 
+# Citing Improve both phases using features adaptive weighting for street view image classification
 
-Project code display, readme.txt is the details 
+# Getting Strated
+Project code display, readme.txt is the details.
 
 
 
