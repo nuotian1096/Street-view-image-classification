@@ -7,7 +7,7 @@
 
 # Results
 | Detector | AP(IoU=0.5:.05:.95) | AP(IoU=0.75) | AP(IoU=0.50) |
-|--------|--|--|--|
+|:--------:|:--:|:--:|:--:|
 |    Ca-50   |    48.72 | 53.24 | 70.21 |
 |    Ca-101  |    48.92 | 53.88 | 70.13 |
 | Ca-50 + VFAW  | 50.1 |  55.2 |  72.4 |
@@ -16,7 +16,7 @@
 visual features adaptive weighting is introduced in the detection phase.
 
 | Models | M-P | M-R | M-F1 |
-|--------|--|--|--|
+|:--------:|:--:|:--:|:--:|
 | Layout+simple-RNN | 81.81 | 80.94 | 81.37 |
 | Layout+SFAW | 82.04 | 80.10 | 81.06 |
 | Centroid Sorting+ SFAW | 83.32 | 79.42 | 81.31 |
