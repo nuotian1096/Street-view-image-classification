@@ -3,7 +3,7 @@
   features adaptive weighting is used in both phases to improve the overall performance of street view image classification. Firstly, visual features adaptive weighting is 
 introduced in the detection phase to improve the recognition accuracy of building objects. Then, a semantic matrix is constructed by using the centroid sorting algorithm to 
 encode the detection results. Finally, in the text classification phase, the semantic feature adaptive weighting is used to enhance the connection between the building objects, 
-and then predict a land category label for the street view image. Experimental results show that the proposed method can effectively improve the performance of //[“detection-
+and then predict a land category label for the street view image. Experimental results show that the proposed method can effectively improve the performance of [“detection-
 encoding-classification”]( https:
 //github.com/kyle-one/Context-Encoding-of-Detected-Buildings/) framework in both phases.
 
