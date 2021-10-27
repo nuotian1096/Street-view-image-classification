@@ -31,8 +31,7 @@ Semantic features adaptive weighting is used in the context classification phase
 GPU: GeForce GTX 1080 X 2; OS: Ubuntu 18.04.3 LTS; CUDA Version: 1.8.0 for cu102; TorchVision Version: 0.9.0 for cu102. 
 
 # Citing:
-
-XProject code display, readme.txt is the details.
+Project code display, readme.txt is the details.
 
 
 
