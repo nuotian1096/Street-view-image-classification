@@ -27,10 +27,12 @@ visual features adaptive weighting is introduced in the detection phase.
 
 Semantic features adaptive weighting is used in the context classification phase.
 
+#Experiments and Requirement
+GPU: GeForce GTX 1080 X 2; OS: Ubuntu 18.04.3 LTS; CUDA Version: 1.8.0 for cu102; TorchVision Version: 0.9.0 for cu102. 
+
 # Citing:
 
-# Getting Strated
-Project code display, readme.txt is the details.
+XProject code display, readme.txt is the details.
 
 
 
