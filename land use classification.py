@@ -299,6 +299,7 @@ def get_pr_list(path_pkl,path_gt,confidence_thr=0.0,merge_iou=False,merge_iou2=F
     
     return pr_list  
 
+#质心排序
 class SpaceSorted:
     def getCenter(bbox):#获得一个bbox的中心点
         center=[bbox[0]+(bbox[2]-bbox[0])/2,bbox[1]+(bbox[3]-bbox[1])/2]
