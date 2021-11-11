@@ -614,18 +614,33 @@ class Self_Attn(nn.Module):
 
         self.softmax = nn.Softmax(dim=-1)  #
 
-    def forward(self, x):
-        m_batchsize, C, width, height = x.size()
-        proj_query = self.query_conv(x).view(m_batchsize, -1, width , height).permute(0,1,3,2)  # B X CX(N)
-        proj_key = self.key_conv(x).view(m_batchsize, -1, width ,height)  # B X C x (*W*H)
-        energy = torch.matmul(proj_query, proj_key)  # transpose check
-        attention = self.softmax(energy)  # BX (N) X (N)
-        proj_value = self.value_conv(x).view(m_batchsize, -1, width , height)  # B X C X N
+    def forward(self, x,att):
+        #建筑类被之间的自适应加权
+        if(att == 1):
+            m_batchsize, C, width, height = x.size()
+            proj_query = self.query_conv(x).view(m_batchsize, -1, width , height).permute(0,1,3,2)  # B X CX(N)
+            proj_key = self.key_conv(x).view(m_batchsize, -1, width ,height)  # B X C x (*W*H)
+            energy = torch.matmul(proj_query, proj_key)  # transpose check
+            attention = self.softmax(energy)  # BX (N) X (N)
+            proj_value = self.value_conv(x).view(m_batchsize, -1, width , height)  # B X C X N
 
-        out = torch.matmul(proj_value, attention)
-        out = out.view(m_batchsize, C, width, height)
+            out = torch.matmul(proj_value, attention)
+            out = out.view(m_batchsize, C, width, height)
 
-        out = self.gamma * out + x
+            out = self.gamma * out + x
+        #框与框之间的自适应加权
+        elif(att == 2):
+            m_batchsize, C, width, height = x.size()
+            proj_query = self.query_conv(x).view(m_batchsize, -1, width , height).permute(0,1,3,2)  # B X CX(N)
+            proj_key = self.key_conv(x).view(m_batchsize, -1, width ,height)  # B X C x (*W*H)
+            energy = torch.matmul(proj_key,proj_query)  # transpose check
+            attention = self.softmax(energy)  # BX (N) X (N)
+            proj_value = self.value_conv(x).view(m_batchsize, -1, width , height)  # B X C X N
+            
+            out = torch.matmul( attention,proj_value)
+            out = out.view(m_batchsize, C, width, height)
+
+            out = self.gamma * out + x
         return out, attention
 
 
@@ -685,7 +700,8 @@ class SA(nn.Module):
         input = input.reshape([-1, 1, 8, 10]) # 卷积
 #         positionalencoding = PositionalEncoded(10).to(config.device) 
 #         input = positionalencoding(input)
-        output1, hidden = self.att1(input)
+        att = 2
+        output1, hidden = self.att1(input,att)
         output2 = output1.reshape([-1, 80])
 
         output = self.out(output2)
