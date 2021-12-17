@@ -578,6 +578,50 @@ class SA(nn.Module):
         # output=F.softmax(output,dim=0)
         return output, hidden
     
+#样本不平衡Loss
+class MutilLabel_SmoothingFocalLoss(nn.Module):
+    def __init__(self, class_num=4, alpha=0.2, gamma=2, use_alpha=False, size_average=True,smoothing=0.1):
+        super(MutilLabel_SmoothingFocalLoss, self).__init__()
+        self.class_num = class_num
+        self.alpha = alpha
+        self.gamma = gamma
+        if use_alpha:
+            self.alpha = torch.tensor(alpha).cuda()
+            # self.alpha = torch.tensor(alpha).cuda()
+
+        self.softmax = nn.Softmax(dim=1)
+        self.use_alpha = use_alpha
+        self.size_average = size_average
+        self.smoothing = smoothing
+        self.confidence = 0.9
+
+
+    def forward(self, pred, target):
+        prob = self.softmax(pred.view(-1,self.class_num))
+        # print(prob)
+        prob = prob.clamp(min=0.0001,max=1.0)  #防止log操作后，值过小
+
+        #target_ = torch.zeros(target.size(0),self.class_num).cuda()
+        target_ = torch.zeros(target.size(0),self.class_num).cuda()
+        target_.scatter_(1, target.view(-1, 1).long(),1.)
+        # print(target_)
+
+        if self.use_alpha:
+            batch_loss = - self.alpha.double() * torch.pow(1-prob,self.gamma).double() * prob.log().double() * target_.double()
+        else:
+            batch_loss = - torch.pow(1-prob,self.gamma).double() * prob.log().double() * target_.double()
+
+        batch_loss = batch_loss.sum(dim=1)
+        smooth_loss = -prob.log().double().mean()
+        # print(smooth_loss)
+        batch_loss = self.confidence * batch_loss + self.smoothing * smooth_loss
+
+        if self.size_average:
+            loss = batch_loss.mean()
+        else:
+            loss = batch_loss.sum()
+        return loss
+    
 def evaluate_loss(data_iter, net,hidden,device, epoch):
     net.eval()
     l_sum, n,val_pred_sum= 0.0, 0,0
@@ -763,7 +807,7 @@ if __name__ == '__main__':
     
     
         lr_period, lr_decay= 5, 0.1
-        criterion = nn.CrossEntropyLoss()
+        criterion = MutilLabel_SmoothingFocalLoss()
         model=SA(10,4).to(config.device)
         model=train(model,train_iter,val_iter,20,lr_period,lr_decay)
 
