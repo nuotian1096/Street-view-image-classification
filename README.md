@@ -36,7 +36,7 @@ Local cross-correlation guided feature adaptive weighting is used in the "top-do
 | no sorting | 82.69 | 81.44 | 82.06 | 86.13 |
 | Layout+RNN | 81.47 | 80.53 | 81.00 | 85.17 |
 | Layout+C-FAW | 83.04 | 81.10 | 82.06 | 86.21 |
-| Centroid Sorting+ C-FAW | 83.73 | 81.22 | 82.64 |
+| Centroid Sorting+ C-FAW | 83.73 | 81.22 | 82.64 | 86.79 |
 
 Centroid Sorting algorithm is used in bounding boxes sorting.
 
