@@ -32,6 +32,7 @@ Local self-correlation guided feature adaptive weighting is introduced in the "b
 Local cross-correlation guided feature adaptive weighting is used in the "top-down" phase.
 
 | Models | M-P | M-R | M-F1 | ACC |
+|:--------:|:--:|:--:|:--:|:--:|
 | no sorting | 82.69 | 81.44 | 82.06 | 86.13 |
 | Layout+RNN | 81.47 | 80.53 | 81.00 | 85.17 |
 | Layout+C-FAW | 83.04 | 81.10 | 82.06 | 86.21 |
