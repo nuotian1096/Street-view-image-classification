@@ -7,7 +7,7 @@ and then predict a land category label for the street view image. Experimental r
 encoding-classification”](https://github.com/nuotian1096/Context-Encoding-of-Detected-Buildings) framework in both phases.
 
 # Overall process 
-![总体流程](https://github.com/nuotian1096/Street-view-image-classification/blob/master/1.png)
+![总体流程](https://github.com/nuotian1096/Street-view-image-classification/blob/master/图片19.png)
 
 # Results
 | Detector | AP(IoU=0.5:.05:.95) | AP(IoU=0.75) | AP(IoU=0.50) |
