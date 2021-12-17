@@ -19,7 +19,7 @@ encoding-classification”](https://github.com/nuotian1096/Context-Encoding-of-D
 | Ca-101 + CBAM | 51.14 |  56.28 |  73.17 |
 | Ca-101 + S-FAW | 51.83 |  56.91 |  73.78 |
 
-local self-correlation guided feature adaptive weighting is introduced in the "bottom-up" phase.
+Local self-correlation guided feature adaptive weighting is introduced in the "bottom-up" phase.
 
 | Models | M-P | M-R | M-F1 | ACC |
 |:--------:|:--:|:--:|:--:|:--:|
@@ -28,13 +28,15 @@ local self-correlation guided feature adaptive weighting is introduced in the "b
 | GRU | 80.43 | 79.22 | 79.82 | 84.57 |
 | LSTM | 80.58 | 79.50 | 80.17 | 84.73 |
 | C-FAW | 82.69 | 81.44 | 82.06 | 86.13 |
-local cross-correlation guided feature adaptive weighting is used in the "top-down" phase.
+
+Local cross-correlation guided feature adaptive weighting is used in the "top-down" phase.
 
 | Models | M-P | M-R | M-F1 | ACC |
 | no sorting | 82.69 | 81.44 | 82.06 | 86.13 |
 | Layout+RNN | 81.47 | 80.53 | 81.00 | 85.17 |
 | Layout+C-FAW | 83.04 | 81.10 | 82.06 | 86.21 |
 | Centroid Sorting+ C-FAW | 83.73 | 81.22 | 82.64 |
+
 Centroid Sorting algorithm is used in bounding boxes sorting.
 
 # Experiments and Requirement
