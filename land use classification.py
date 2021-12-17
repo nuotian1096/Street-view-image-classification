@@ -16,13 +16,8 @@ from PIL import Image,ImageTk,ImageDraw,ImageFont
 import math
 
 class config:
-    #PATH_PKL="/Public/YongkunLiu/workdir_coco_reb_new/faster_rcnn_r101_fpn_2x_coco/results_train.pkl"
     PATH_GT_TRAIN="/Public/TianYu/NewTest/Datasets/BEAUTY1.0_COCOLike_8_16/Split0/annotations/train_reb.json"
-    
-    #PATH_PKL_TEST="//Public/YongkunLiu/workdir_coco_reb_new/faster_rcnn_r101_fpn_2x_coco/results_test.pkl"
     PATH_GT_TEST="/Public/TianYu/NewTest/Datasets/BEAUTY1.0_COCOLike_8_16/Split0/annotations/test.json"
-    
-    #PATH_PKL_VAL="Public/YongkunLiu/workdir_coco_reb_new/faster_rcnn_r101_fpn_2x_coco/results_val.pkl"
     PATH_GT_VAL="/Public/TianYu/NewTest/Datasets/BEAUTY1.0_COCOLike_8_16/Split0/annotations/val.json"
     
     PATH_PR={'faster_rcnn_r50':'/Public/TianYu/NewTest/COCO/workdir_coco_9_2/faster_rcnn_r50_fpn_2x_coco/',
@@ -30,13 +25,8 @@ class config:
           'faster_rcnn_r101':'/Public/TianYu/NewTest/COCO/workdir_coco_9_2/faster_rcnn_r101_fpn_2x_coco/',
           'cascade_rcnn_r50':'/Public/TianYu/NewTest/workdir_coco_5_18/scnet_r50_fpn_20e_coco/'}
     
+  
     
-    
-#     PATH_PKL_TEST="/Public/TianYu/NewTest/COCO/workdir_coco_9_2/cascade_rcnn_r101_fpn_20e_coco/results_test.pkl"
-    
-    
-    
-    PATH_CLASSIFICATION='/Public/TianYu/NewTest/Datasets/BEAUTY1.0_COCOLike/classification.json'
     labels=['Commercial','Residential','Industrial','Public']
     bboxs=['retail','house','roof','officebuilding','apartment','garage','industrial','church']
     labels2idx={label:idx for idx,label in enumerate(labels)}
@@ -141,96 +131,7 @@ def get_logger():
     fHandler.setFormatter(formatter)
     logger.addHandler(fHandler)
     return logger
-def bbox_distribution(PATH_GT):
-    with open(PATH_GT) as f:
-        json_data=json.load(f)
-    #json_data
 
-    bboxs=[0.0 for i in range(8)]
-    #classfication={i:bboxs.copy() for i in config.labels}
-    classfication=[bboxs.copy() for i in range(4)]
-#     with open(config.WORK_DIR+'/'+'trainbuildname.txt','w+') as f:
-        
-    for bbox_idx in range(len(json_data['annotations'])):
-        
-        image_idx=json_data['annotations'][bbox_idx]['image_id']-1
-        image_cate=json_data['images'][image_idx]['file_name'].split('_')[0]
-#         print(image_cate)
-        image_cate=config.labels2idx[image_cate]
-        
-        bbox_cate=json_data['annotations'][bbox_idx]['category_id']-1
-#             print(bbox_cate)
-           
-#             map(bbox_cate,str(bbox_cate))
-#             for i in bbox_cate:
-#             f.write(bbox_dic[bbox_cate]+' ')
-#             break
-        classfication[image_cate][bbox_cate]+=1
-#         print(classfication)
-#     f.close()
-    for i in range(len(classfication)):
-        sum_t=0
-        for j in range(len(classfication[i])):
-            sum_t+=classfication[i][j]
-        for j in range(len(classfication[i])):
-            classfication[i][j]/=sum_t
-#         print(classfication)
-    return classfication
-def reconfidence(pr_list,bbox_distribution,classfication_pr):
-    pr_list=pr_list.copy()
-    pr_idx=0
-    for image_idx in range(len(pr_list)):
-        for bbox_idx in range(len(pr_list[image_idx])):
-            #print(pr_list[image_idx][bbox_idx]['score'])
-            s=pr_list[image_idx][bbox_idx]['score']
-            #p=bbox_distribution[pr_list[image_idx][bbox_idx]['image_class']][pr_list[image_idx][bbox_idx]['cate']]
-            #print(image_idx)
-            t=classfication_pr[image_idx]
-            p=0
-            for t_idx in range(len(t)):
-                p+=t[t_idx]*bbox_distribution[t_idx][pr_list[image_idx][bbox_idx]['cate']]
-            pr_list[image_idx][bbox_idx]['score']=s*s+(1-s)*p
-            pr_idx+=1
-    return pr_list
-def add_gt_bbox(pr_list,gt_json):#将pr_list中加入gt_bbox标签
-    for i_idx in range(len(pr_list)):
-        for b_idx in range(len(pr_list[i_idx])):
-            pr_list[i_idx][b_idx]['gt_cate']=-1
-
-    for gt_bbox_idx in range(len(gt_json['annotations'])):
-        gt_bbox=gt_json['annotations'][gt_bbox_idx]['bbox']
-        gt_bbox[3]+=gt_bbox[1]
-        gt_bbox[2]+=gt_bbox[0]
-        gt_bbox_cate=gt_json['annotations'][gt_bbox_idx]['category_id']-1
-        image_idx=gt_json['annotations'][gt_bbox_idx]['image_id']-1
-#         print(image_idx)
-        for pr_bbox_idx in range(len(pr_list[image_idx])):
-            if (pr_list[image_idx][pr_bbox_idx]==[]):
-                continue
-            pr_bbox=pr_list[image_idx][pr_bbox_idx]['bbox']
-            iou_=iou(gt_bbox,pr_bbox)
-            if(iou_>0.5):
-                pr_list[image_idx][pr_bbox_idx]['gt_cate']=gt_bbox_cate
-        for pr_bbox_idx in range(len(pr_list[image_idx])):
-            if (pr_list[image_idx][pr_bbox_idx]==[]):
-                continue
-            if (pr_list[image_idx][pr_bbox_idx]['gt_cate']!=-1):
-                continue
-            pr_bbox=pr_list[image_idx][pr_bbox_idx]['bbox']
-#             iou_=SpaceSort.iou_small(gt_bbox,pr_bbox)
-            if(iou_>0.6):
-                pr_list[image_idx][pr_bbox_idx]['gt_cate']=gt_bbox_cate
-      
-    return pr_list
-def iou(gt_bbox,pr_bbox):
-    gt=gt_bbox.copy()
-    pr=pr_bbox.copy()
-    lou_w=min(gt[0],gt[2],pr[0],pr[2])+(gt[2]-gt[0])+(pr[2]-pr[0])-max(gt[0],gt[2],pr[0],pr[2])
-    lou_h=min(gt[1],gt[3],pr[1],pr[3])+(gt[3]-gt[1])+(pr[3]-pr[1])-max(gt[1],gt[3],pr[1],pr[3])
-    if(lou_w<0 or lou_h<0):
-        return(-1)
-    else:
-        return(lou_w*lou_h/((gt[2]-gt[0])*(gt[3]-gt[1])+(pr[2]-pr[0])*(pr[3]-pr[1])-lou_w*lou_h))
 def get_pr_list(path_pkl,path_gt,confidence_thr=0.0,merge_iou=False,merge_iou2=False,bbox_num_thr=0):
     #merge_iou，同一位置只保留score最大的,merge_iou2：相同位置的归类，但是保留
     #bbox_num_thr等于2，则把一个bbox和两个bbox的image全pass了。以此类推
@@ -238,8 +139,6 @@ def get_pr_list(path_pkl,path_gt,confidence_thr=0.0,merge_iou=False,merge_iou2=F
         pkl_data = pickle.load(f)
     with open(path_gt) as f:
         json_data=json.load(f)
-    with open(config.PATH_CLASSIFICATION) as f:
-        class_data=json.load(f)
         
     #list一个元素是一张图片
     #一张图片有多个bbox列表
@@ -247,9 +146,6 @@ def get_pr_list(path_pkl,path_gt,confidence_thr=0.0,merge_iou=False,merge_iou2=F
     #将pkl预测文件转化为list
     #reb变化有三种：_HorizontalFlip _hue 和 
     pr_list=[]
-    with open(config.PATH_CLASSIFICATION) as f:
-        class_data=json.load(f)
-#     with open(config.WORK_DIR+'/'+'val_confidence.txt','w+') as f:
         
     for image_idx,image in enumerate(pkl_data):
         
@@ -295,7 +191,6 @@ def get_pr_list(path_pkl,path_gt,confidence_thr=0.0,merge_iou=False,merge_iou2=F
          pr_list.append(image_list)
     #print(len(pr_list))
 #     f.close()
-    add_gt_bbox(pr_list,json_data)
     
     return pr_list  
 
@@ -555,33 +450,8 @@ class BEAUTY_bbox_Dataset(Dataset):
 #             return input_onehot,bbox_label,label
 
         return input_onehot,label
-def get_gt_list(path_gt):
-    with open(path_gt) as f:
-        json_data=json.load(f)
-    
-    ann_idx=0
-    gt_list=[]
-    for img_idx in range(len(json_data['images'])):
-        image_list=[]
-        #print(img_idx)
-        while(json_data['images'][img_idx]['id']==json_data['annotations'][ann_idx]['image_id']):
-            t={}
-            t['score']=1.0
-            t['bbox']=json_data['annotations'][ann_idx]['bbox'].copy()
-            t['bbox'][2]+=t['bbox'][0]
-            t['bbox'][3]+=t['bbox'][1]
-            t['bbox']=np.array(t['bbox'],dtype='float32')
-            t['cate']=json_data['annotations'][ann_idx]['category_id']-1
-            t['image_name']=json_data['images'][img_idx]['file_name']
-            t['image_class']=t['image_name'].split('_')[0]
-            #print(t['image_class'])
-            t['image_class_idx']=config.labels2idx[t['image_class']]
-            image_list.append(t)
-            ann_idx+=1
-            if(ann_idx>=len(json_data['annotations'])):
-                break
-        gt_list.append(image_list)
-    return gt_list
+
+#位置编码
 class PositionalEncoded(nn.Module):
 
     def __init__(self, d_model, max_len=8):
@@ -598,7 +468,7 @@ class PositionalEncoded(nn.Module):
     def forward(self, x):
         return x + self.pe
 
-
+#自注意力模块
 class Self_Attn(nn.Module):
     """ Self attention Layer"""
 
@@ -707,6 +577,7 @@ class SA(nn.Module):
         output = self.out(output2)
         # output=F.softmax(output,dim=0)
         return output, hidden
+    
 def evaluate_loss(data_iter, net,hidden,device, epoch):
     net.eval()
     l_sum, n,val_pred_sum= 0.0, 0,0
@@ -730,144 +601,6 @@ def evaluate_loss(data_iter, net,hidden,device, epoch):
     logger.info("[epoch {}][{}][end] val_loss={:.5f},val_acc:{:.5f}({}/{})".format\
     (epoch,'val',l_sum/(bidx+1),val_pred_sum/n,int(val_pred_sum),n))
     return l_sum / (bidx+1),val_pred_sum/n
-
-    
-
-def evaluate_loss_multi_task(data_iter, net,hidden,device, epoch):
-    net.eval()
-    l_sum, n,val_pred_sum= 0.0, 0,0
-    with torch.no_grad():
-        for bidx,(X, y_confidence,y) in enumerate(data_iter):
-            X=X.float()
-            X=X.permute(1,0,2)#[32, 10, 8]->[10,32,8]
-            y=y.to(device)
-            X=X.to(device)
-            y_confidence=y_confidence.to(device)
-            
-            y_hat,y_confidence_hat,hidden= net(X,hidden)
-            loss=nn.CrossEntropyLoss()(y_hat,y)+nn.MSELoss()(y_confidence,y_confidence_hat)
-            
-            l_sum+=loss
-            #l_sum +=criterion(y_hat, y).item()
-            n += X.size()[1]
-            pred=y_hat.max(1, keepdim=True)[1].view(-1)
-            pred_sum=pred.eq(y.view_as(pred)).sum().item()
-            val_pred_sum+=pred_sum
-    #print('val,epoch:{},pred:{},loss:{}'.format(epoch,val_pred_sum/n,l_sum/n))
-    logger.info("[epoch {}][{}][end] val_loss={:.5f},val_acc:{:.5f}({}/{})".format\
-    (epoch,'val',l_sum/(bidx+1),val_pred_sum/n,int(val_pred_sum),n))
-    return l_sum / (bidx+1),val_pred_sum/n
-
-
-def train_multi_task(net,train_iter,val_iter,num_epoch,lr_period,lr_decay):
-    optimizer = torch.optim.Adam(net.parameters(),lr=0.01)
-    hidden=None
-    Max_Acc=0.0
-    for epoch in range(num_epoch):
-        net.train()
-        n,train_l_sum,train_pred_sum=0,0,0
-        loss_confidence_sum,loss_classfication_sum=0.0,0.0
-        if epoch > 0 and epoch % lr_period == 0:
-            optimizer.param_groups[0]['lr']=optimizer.param_groups[0]['lr']*lr_decay
-            
-        for bidx, (X,y_confidence,y) in enumerate(train_iter):
-            X=X.float()
-            X=X.permute(1,0,2)#[32, 10, 8]->[10,32,8]
-            X=X.to(config.device)
-            y=y.to(config.device)
-            y_confidence=y_confidence.to(config.device)
-            if(hidden is not None):
-                
-                if isinstance (hidden, tuple): # LSTM, state:(h, c)  
-                    hidden[0].to(config.device)
-                    hidden[1].to(config.device)
-                    hidden = (hidden[0].detach(), hidden[1].detach())
-                else:   
-                    hidden.to(config.device)
-                    hidden = hidden.detach()
-            
-            optimizer.zero_grad()
-            #print(str(bidx)+'---------------')
-            #print(hidden)
-            y_hat,y_confidence_hat,hidden= net(X,hidden)
-            #print(y_hat.size())
-            #loss = criterion(y_hat, y)
-            loss_classfication=nn.CrossEntropyLoss()(y_hat,y)
-            loss_confidence=nn.MSELoss()(y_confidence,y_confidence_hat)
-            loss=loss_classfication+loss_confidence
-            #print(y_hat)
-            #print(y)
-            #print(loss.item())
-            loss.backward()
-            optimizer.step()
-            #print(loss)
-            pred=y_hat.max(1, keepdim=True)[1].view(-1)
-            pred_sum=pred.eq(y.view_as(pred)).sum().item()
-            #print(pred_sum)
-            train_l_sum+=loss
-
-            loss_confidence_sum+=loss_confidence
-            loss_classfication_sum+=loss_classfication
-
-
-            
-            train_pred_sum+=pred_sum
-            n+=X.size(1)
-        #print("train,epoch:{},pred:{},loss:{}".format(epoch,train_pred_sum/n,train_l_sum/n))
-        #print(str(train_pred_sum)+'/'+str(n))
-        #print(train_pred_sum/n)
-        if not os.path.exists('./params'):
-            os.makedirs('./params')
-        logger.info("[epoch {}][{}][end] train_loss={:.5f},loss_classfication={:.5f},loss_confidence={:.5f},train_acc={:.5f}({}/{})".format\
-                    (epoch,'train',train_l_sum/(bidx+1),loss_classfication_sum/(bidx+1),loss_confidence_sum/(bidx+1),train_pred_sum/n,int(train_pred_sum),n))
-        valid_loss,valid_acc=evaluate_loss_multi_task(val_iter, net,hidden,config.device,epoch)
-        if(valid_acc>Max_Acc):
-            Max_Acc=valid_acc
-            model_best=net
-            #torch.save(net,'./params/'+MODEL_NAME+'_'+DATASET_NAME+'_best.pth')
-           # torch.save(net,'./params/{}_BIDI-{}_NUMLAYERS-{}_HIDDENSIZE-{}_best.pth'.format\
-                      # (RNN_TYPE,BIDIRECTIONAL,NUM_LAYERS,HIDDEN_SIZE))
-            logger.info("[epoch {}][save_best_output_params]".format(epoch))
-            #n+=y.size()[0]
-            #print(n)
-    return model_best
-
-#test后，得出acc
-def test_multi_task(net,test_iter,device):
-    net.eval()
-    matrix=[[0 for j in range(4)] for i in range(4)]
-    
-    hidden=None
-    sum=0
-    n=0
-    for bidx, (X,y_confidence,y) in enumerate(test_iter):
-        X=X.float()
-        X=X.permute(1,0,2)#[32, 10, 8]->[10,32,8]
-        X=X.to(device)
-        y=y.to(device)
-        y_confidence=y_confidence.to(device)
-        if(hidden is not None):
-
-            if isinstance (hidden, tuple): # LSTM, state:(h, c)  
-                hidden[0].to(device)
-                hidden[1].to(device)
-                hidden = (hidden[0].detach(), hidden[1].detach())
-            else:   
-                hidden.to(device)
-                hidden = hidden.detach()
-        y_hat,y_confidence_hat,hidden= net(X,hidden)
-
-
-        pred=y_hat.max(1, keepdim=True)[1].view(-1)
-
-        pred=pred.cpu().numpy().tolist()
-        y=y.cpu().numpy().tolist()
-        for idx in range(len(y)):
-            #print(idx)
-            matrix[y[idx]][pred[idx]]+=1
-
-    return matrix
-
 
 def train(net,train_iter,val_iter,num_epoch,lr_period,lr_decay):
     optimizer = torch.optim.Adam(net.parameters(),lr=0.01)
@@ -936,46 +669,6 @@ def train(net,train_iter,val_iter,num_epoch,lr_period,lr_decay):
     return model_best
 
 #test后，得出acc
-def test(net,test_iter,device):
-    net.eval()
-    matrix=[[0 for j in range(4)] for i in range(4)]
-    
-    hidden=None
-    sum=0
-    n=0
-    for bidx, (X,y) in enumerate(test_iter):
-        X=X.float()
-        X=X.permute(1,0,2)#[32, 10, 8]->[10,32,8]
-        X=X.to(device)
-        y=y.to(device)
-        if(hidden is not None):
-
-            if isinstance (hidden, tuple): # LSTM, state:(h, c)  
-                hidden[0].to(device)
-                hidden[1].to(device)
-                hidden = (hidden[0].detach(), hidden[1].detach())
-            else:   
-                hidden.to(device)
-                hidden = hidden.detach()
-        y_hat,hidden= net(X,hidden)
-        pred=y_hat.max(1, keepdim=True)[1].view(-1)
-        '''
-        print(y_hat)
-        print(gjifjsg)
-        pred=pred.cpu().numpy().tolist()
-        y=y.cpu().numpy().tolist()
-        for idx in range(len(y)):
-            #print(idx)
-            matrix[y[idx]][pred[idx]]+=1
-        '''
-        #print(y_hat)
-        #print(y)
-        pred_sum=pred.eq(y.view_as(pred)).sum().item()
-        sum+=pred_sum
-        n+=len(y)
-    return sum/n
-
-#test后，得出acc
 def test_matrix(net,test_iter,device):
     net.eval()
     matrix=[[0 for j in range(4)] for i in range(4)]
@@ -1012,36 +705,6 @@ def test_matrix(net,test_iter,device):
         #sum+=pred_sum
         #n+=len(y)
     return matrix
-
-#test后，得出acc
-def test2(net,test_iter,device):
-    net.eval()
-    matrix=[[0 for j in range(4)] for i in range(4)]
-    
-    hidden=None
-    sum=[]
-    with torch.no_grad():
-        for bidx, (X,y) in enumerate(test_iter):
-            X=X.float()
-            X=X.permute(1,0,2)#[32, 10, 8]->[10,32,8]
-            X=X.to(device)
-            y=y.to(device)
-            if(hidden is not None):
-
-                if isinstance (hidden, tuple): # LSTM, state:(h, c)  
-                    hidden[0].to(device)
-                    hidden[1].to(device)
-                    hidden = (hidden[0].detach(), hidden[1].detach())
-                else:   
-                    hidden.to(device)
-                    hidden = hidden.detach()
-            y_hat,hidden= net(X,hidden)
-            y_hat=F.softmax(y_hat,dim=1)
-            y_hat=y_hat.cpu().numpy().tolist()
-            #print(y_hat)
-            #sum.append(y_hat)
-            sum+=y_hat
-    return sum
 
 def F1(maxtir):
     sum_Pre=0
@@ -1096,7 +759,7 @@ if __name__ == '__main__':
 
         train_iter=DataLoader(train_ds,batch_size=config.BATCH_SIZE,shuffle=True,num_workers=5,drop_last=True)
         val_iter=DataLoader(val_ds,batch_size=config.BATCH_SIZE,shuffle=True,num_workers=5,drop_last=True)
-        test_iter=DataLoader(test_ds,batch_size=1,shuffle=False,num_workers=5,drop_last=True)
+        test_iter=DataLoader(test_ds,batch_size=32,shuffle=False,num_workers=5,drop_last=True)
     
     
         lr_period, lr_decay= 5, 0.1
